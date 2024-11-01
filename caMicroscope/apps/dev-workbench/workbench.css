@@ -1,0 +1,69 @@
+#headbar {
+  background: rgb(23, 162, 184);
+  align-items: center;
+  text-align: center;
+  color: white;
+}
+.step-content {
+  border-radius: 10px;
+}
+#stepper {
+  align-content: center;
+  display: flex;
+  flex-wrap: wrap;
+}
+/* .done a.circle{
+  background-color: green !important;
+} */
+.btn {
+  text-transform: unset !important;
+}
+.nabvar {
+  display: flex;
+  flex-direction: row;
+}
+.navbar-brand {
+  margin-right: 10rem !important;
+}
+/* All display none */
+#importFile,
+#headContent,
+#headSub,
+#secondStepButton,
+#cards,
+#filterLabels,
+#labelsDatasetZip,
+#selectResolution,
+#labelsSubmitLoading,
+#labelsSubmitFinish,
+#toastPlaceholder {
+  display: none;
+}
+
+#goBack {
+  display: flex;
+  margin: 0 1rem;
+}
+@media only screen and (max-width: 551px) {
+  nav {
+    flex-direction: column;
+  }
+
+  nav ul {
+    flex-direction: column;
+  }
+
+  nav ul li {
+    margin: 10px 0;
+  }
+}
+
+.dropdown-menu {
+  margin-left: -5em !important;
+}
+
+@media (max-width: 425px) {
+  .dropdown-menu {
+    margin-left: 0 !important;
+  }
+}

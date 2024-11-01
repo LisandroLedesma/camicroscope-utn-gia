@@ -1,0 +1,65 @@
+version: '2'
+
+services:
+  mongo:
+    image: mongo:4.2-bionic
+    container_name: ca-mongo
+    volumes:
+      - ./db:/data/db
+  back:
+    build:
+      context: "https://github.com/camicroscope/caracal.git#develop"
+      args:
+        viewer: "develop"
+        fork: "camicroscope"
+    depends_on:
+      - "mongo"
+    ports:
+      - "4010:4010"
+      - "9229:9229"
+    container_name: ca-back
+    command: node --inspect=0.0.0.0:9229 --prof caracal.js
+    volumes:
+      - ./config/login.html:/src/static/login.html
+      - ./jwt_keys/:/src/keys/
+      - ./config/routes.json:/src/routes.json
+      - ./config/contentSecurityPolicy.json:/src/contentSecurityPolicy.json
+    environment:
+      JWK_URL: "https://www.googleapis.com/oauth2/v3/certs"
+      IIP_PATH: "http://ca-iip:8080/fcgi-bin/iipsrv.fcgi"
+      MONGO_URI: "mongodb://ca-mongo"
+      DISABLE_SEC: "true"
+      ALLOW_PUBLIC: "true"
+      NUM_THREADS: 1
+  iip:
+    build: "https://github.com/camicroscope/iipImage.git#develop"
+    container_name: ca-iip
+    restart: unless-stopped
+    volumes:
+      - ./images/:/images/
+  loader:
+    build: "https://github.com/camicroscope/SlideLoader.git#develop"
+    container_name: ca-load
+    volumes:
+      - ./images/:/images/
+      - ./cloud-upload-apis/:/cloud-upload-apis/
+    environment:
+      DICOM_PORT: "11112"
+      DICOM_UI_PORT: "8042"
+  dicomsrv:
+    build: "https://github.com/camicroscope/dicomsrv.git"
+    container_name: ca-dicomsrv
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    ports:
+      - "8042:8042"
+      - "11112:11112"
+    volumes:
+      - ./jwt_keys/:/root/keys/
+      - ./images/:/images/
+      - ./config/OrthancConfiguration.json:/root/src/Configuration.json
+    environment:
+      DICOM_PORT: "11112"
+      DICOM_UI_PORT: "8042"
+      CARACAL_BACK_HOST_PORT: "ca-back:4010"
